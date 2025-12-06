@@ -1,0 +1,9 @@
+[package]
+name = "non-resident-vapid"
+version = "0.1.0"
+edition = "2021"
+description = "Client-side encryption/decryption workflow for VAPID credentials and message relay"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+# 依存関係は後から追加予定（暗号・シリアライゼーション系を想定）
