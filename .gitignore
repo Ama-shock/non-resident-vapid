@@ -1,0 +1,12 @@
+# Rust ビルド成果物
+/target
+
+# E2E 出力
+/e2e/output
+
+# Node.js 依存物
+/node_modules
+/e2e/node_modules
+
+# 生成物・ログ
+*.log

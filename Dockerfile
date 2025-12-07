@@ -1,5 +1,5 @@
-# ベースイメージ: Rust ツールチェーン入りの Debian Slim
-FROM rust:1.75-slim AS builder
+# ベースイメージ: Rust ツールチェーン入りの Debian bookworm Slim
+FROM rust:1.91-slim-bookworm AS builder
 
 # ビルド・テストで要求される最低限の依存
 RUN apt-get update \

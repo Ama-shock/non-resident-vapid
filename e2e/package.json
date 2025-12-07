@@ -1,0 +1,12 @@
+{
+  "name": "non-resident-vapid-e2e",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "get-push-params": "node get_push_params.js"
+  },
+  "dependencies": {
+    "puppeteer-core": "^22.6.5"
+  }
+}
