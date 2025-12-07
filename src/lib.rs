@@ -1,0 +1,28 @@
+pub mod credential_bundle;
+pub mod push_sender;
+pub mod subscription;
+#[cfg(target_arch = "wasm32")]
+pub mod wasm;
+pub mod key_store;
+
+use anyhow::Result;
+use key_store::{KeyStore};
+use push_sender::pushを送信;
+
+/// 暗号化済みクレデンシャルバンドルを復号し、Push を送信する外部公開関数。
+/// 復号・署名は KeyStore/KeyHandle 実装に委譲する。
+pub async fn deliver_push_from_bundle(
+    bundle: &[u8],
+    payload: &str,
+    ttl: u32,
+    subject: &str,
+    key_store: &dyn KeyStore,
+) -> Result<()> {
+    if bundle.len() < 9 {
+        anyhow::bail!("バンドル長が短すぎます");
+    }
+    let key_id: [u8; 8] = bundle[..8].try_into().unwrap();
+    let handle = key_store.lookup(&key_id)?;
+    let subscription = credential_bundle::decode_credential_bundle(bundle, key_store)?;
+    pushを送信(&subscription, payload, ttl, subject, handle.as_ref()).await
+}

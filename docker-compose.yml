@@ -15,5 +15,19 @@ services:
       - E2E_SEND_PUSH=1
       - DISPLAY=:99
 
+  dev-tests:
+    image: rust:1.91-slim-bookworm
+    working_dir: /work
+    volumes:
+      - .:/work
+      - cargo-git:/usr/local/cargo/git
+      - cargo-registry:/usr/local/cargo/registry
+      - target:/work/target
+      - ./scripts/run_cargo_tests.sh:/work/scripts/run_cargo_tests.sh:ro
+    command: ["/work/scripts/run_cargo_tests.sh"]
+
 volumes:
   push-data:
+  cargo-git:
+  cargo-registry:
+  target:
