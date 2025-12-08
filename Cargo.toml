@@ -4,6 +4,18 @@ version = "0.1.0"
 edition = "2021"
 description = "Client-side encryption/decryption workflow for VAPID credentials and message relay"
 license = "MIT OR Apache-2.0"
+repository = "https://github.com/Ama-shock/non-resident-vapid"
+readme = "README.md"
+keywords = ["webpush", "vapid", "wasm", "push"]
+categories = ["network-programming", "web-programming::http-client"]
+exclude = [
+    "target/**",
+    "e2e/**",
+    "scripts/**",
+    ".github/**",
+    "docker-compose.yml",
+    "Dockerfile",
+]
 
 [dependencies]
 anyhow = "1"

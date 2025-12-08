@@ -1,0 +1,68 @@
+name: release-artifacts
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Release tag (prefix不要, e.g. v0.1.0)"
+        required: true
+  push:
+    tags:
+      - "release/*"
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write  # release ブランチ更新と Release 作成に必要
+    env:
+      RAW_TAG: ${{ github.ref_name }}
+      INPUT_VERSION: ${{ github.event.inputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # ブランチ更新のため履歴が必要
+
+      - name: Resolve version
+        run: |
+          if [ -n "${INPUT_VERSION}" ]; then
+            VERSION="${INPUT_VERSION}"
+          else
+            # github.ref_name example: release/v0.1.0 -> v0.1.0
+            VERSION="${RAW_TAG#release/}"
+          fi
+          echo "VERSION=${VERSION}" >> "$GITHUB_ENV"
+
+      - name: Build artifacts in container
+        run: |
+          docker compose run --rm release-build bash /work/scripts/release_build_inner.sh
+
+      - name: Prepare release branch worktree
+        run: |
+          git worktree add /tmp/release-work release-artifacts || \
+            (git branch release-artifacts && git worktree add /tmp/release-work release-artifacts)
+          # ベースとなるリポジトリ内容を同期（生成物は後で上書き）
+          rsync -a --delete --exclude '.git/' --exclude 'target/' --exclude 'dist/' --exclude 'pkg/' --exclude 'package.json' ./ /tmp/release-work/
+          # 生成物を配置
+          rsync -a --delete dist/ /tmp/release-work/dist/
+          rsync -a --delete pkg/ /tmp/release-work/pkg/
+          cp package.json /tmp/release-work/package.json
+          cd /tmp/release-work
+          git add .
+          git add -f dist pkg package.json
+          git commit -m "Release $VERSION artifacts" || echo "No changes to commit"
+          git push origin HEAD:release-artifacts
+          git tag -f "$VERSION"
+          git tag -f latest
+          git push origin "refs/tags/$VERSION" --force
+          git push origin "refs/tags/latest" --force
+
+      - name: Create GitHub Release
+        run: |
+          gh release create "$VERSION" dist/* \
+            --title "$VERSION" \
+            --notes "Automated release $VERSION" \
+            --target release-artifacts || echo "Release may already exist"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

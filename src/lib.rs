@@ -1,3 +1,12 @@
+//! # non-resident-vapid
+//! WebPush/VAPID のクレデンシャルバンドルを暗号化・復号し、サーバ側で送信まで行うためのライブラリ。
+//! WASM からのエンコード、サーバでの復号と Push 送信を 1 クレートで扱う。
+//!
+//! Git 依存での利用例:
+//! ```toml
+//! non-resident-vapid = { git = "https://github.com/Ama-shock/non-resident-vapid", tag = "v0.1.0" }
+//! ```
+
 pub mod credential_bundle;
 pub mod push_sender;
 pub mod subscription;

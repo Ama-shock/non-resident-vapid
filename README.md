@@ -42,3 +42,37 @@
 
 ## ステータス
 現時点では骨組みのみで、`encrypt`/`decrypt`/`message` などのモジュールは未実装です。E2E では VAPID 署名付き Push の送受信疎通をコンテナ内で確認できます。
+
+## Git 依存としての利用
+crates.io には公開していないため、Cargo.toml では git 依存を指定してください。再現性のためタグで固定することを推奨します。
+
+```toml
+[dependencies]
+non-resident-vapid = { git = "https://github.com/Ama-shock/non-resident-vapid", tag = "v0.1.0" }
+```
+
+### npm から WASM を利用する場合
+ルートに生成される `pkg/` 配下に wasm-bindgen 出力を含むパッケージを置きます。GitHub リポジトリを直接指定して取得できます。
+
+```sh
+npm install https://github.com/Ama-shock/non-resident-vapid#v0.1.0
+```
+
+```jsonc
+// package.json の例
+{
+  "dependencies": {
+    "@ama-shock/non-resident-vapid": "github:Ama-shock/non-resident-vapid#v0.1.0"
+  }
+}
+```
+
+ビルド手順:
+- `scripts/build_release_in_container.sh`: Rust/wasm/npm のビルドをコンテナ内で完結させ dist/ に成果物を配置
+- `scripts/build_wasm_package.sh`: (ローカル環境に Rust がある場合) wasm-bindgen で `pkg/` を生成
+
+`package.json` は `Cargo.toml` から `scripts/generate_npm_package_json.sh` で自動生成します。手動編集は不要です。
+
+### リリースタグ運用
+- リリース CI は `release/*` タグの push をトリガに起動し、`release/` プレフィックスを除いたタグ（例: `release/v0.1.0` → `v0.1.0`）と `latest` をリリースブランチに付与します。
+- npm/Cargo からは `github:Ama-shock/non-resident-vapid#v0.1.0` や `#latest` として直接参照できます。
