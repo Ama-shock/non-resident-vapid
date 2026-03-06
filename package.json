@@ -1,0 +1,23 @@
+{
+  "name": "@ama-shock/non-resident-vapid",
+  "version": "0.1.0",
+  "description": "Client-side encryption/decryption workflow for VAPID credentials and message relay",
+  "main": "./pkg/non_resident_vapid.js",
+  "module": "./pkg/non_resident_vapid.js",
+  "types": "./pkg/non_resident_vapid.d.ts",
+  "sideEffects": false,
+  "files": [
+    "pkg/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Ama-shock/non-resident-vapid"
+  },
+  "license": "MIT OR Apache-2.0",
+  "keywords": [
+    "webpush",
+    "vapid",
+    "wasm",
+    "push"
+  ]
+}
