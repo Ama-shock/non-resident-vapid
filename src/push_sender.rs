@@ -1,7 +1,8 @@
-use anyhow::{Context, Result, bail};
+use anyhow::{Context, Result, bail, anyhow};
 use web_push::{
-    ContentEncoding, SubscriptionInfo, VapidSignature, WebPushClient, WebPushMessageBuilder,
+    ContentEncoding, SubscriptionInfo, VapidSignature, WebPushClient, WebPushMessageBuilder, WebPushError,
 };
+use p256::{PublicKey, elliptic_curve::sec1::ToEncodedPoint};
 
 use crate::subscription::購読データ;
 use crate::key_store::KeyHandle;
@@ -24,13 +25,14 @@ pub async fn pushを送信(
         .with_context(|| "WebPushMessageBuilder の初期化に失敗")?;
     メッセージ.set_vapid_signature(vapid署名);
     メッセージ.set_ttl(ttl);
-    メッセージ.set_payload(ContentEncoding::Aes128Gcm, 本文.as_bytes());
+    // FCM 互換性の高い AESGCM で暗号化する
+    メッセージ.set_payload(ContentEncoding::AesGcm, 本文.as_bytes());
 
     let クライアント = WebPushClient::new().with_context(|| "WebPushClient の初期化に失敗")?;
     クライアント
         .send(メッセージ.build().with_context(|| "メッセージの組み立てに失敗")?)
         .await
-        .with_context(|| "Web Push 送信に失敗")?;
+        .map_err(|e| anyhow!("Web Push 送信に失敗: {:?}", e))?;
 
     Ok(())
 }
@@ -59,11 +61,12 @@ fn vapid署名作成(
     if sig.len() != 64 {
         bail!("署名長が想定外です (expected 64 bytes)");
     }
-    let sig_b64 = base64url_encode(sig);
-    let jwt = format!("{}.{}", message, sig_b64);
-
-    let auth_t = format!("WebPush {}", jwt);
-    let auth_k = format!("p256ecdsa={}", base64url_encode(鍵ハンドル.public_key_bytes())).into_bytes();
+    let sig_b64 = base64url_encode(&sig);
+    // auth_t には JWT 全体（header.payload.sig）のみ。
+    // web-push クレートが "vapid t=<auth_t>, k=<base64url(auth_k)>" に組み立てる。
+    let auth_t = format!("{}.{}", message, sig_b64);
+    // auth_k には非圧縮公開鍵の生バイト。クレート側で base64url エンコードされる。
+    let auth_k = vapid公開鍵_非圧縮(鍵ハンドル.public_key_bytes())?;
 
     Ok(VapidSignature { auth_t, auth_k })
 }
@@ -74,4 +77,10 @@ fn aud_from_endpoint(endpoint: &str) -> Result<String> {
     let host = url.host_str().ok_or_else(|| anyhow::anyhow!("endpoint にホストがありません"))?;
     let port = url.port().map(|p| format!(":{}", p)).unwrap_or_default();
     Ok(format!("{}://{}{}", scheme, host, port))
+}
+
+fn vapid公開鍵_非圧縮(raw: &[u8]) -> Result<Vec<u8>> {
+    let pk = PublicKey::from_sec1_bytes(raw)
+        .map_err(|_| anyhow::anyhow!("VAPID 公開鍵のパースに失敗しました"))?;
+    Ok(pk.to_encoded_point(false).as_bytes().to_vec())
 }

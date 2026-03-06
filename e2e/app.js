@@ -56,7 +56,7 @@ async function メイン() {
       JSON.stringify(ペイロード),
       設定.keyIdBase64Url,
       設定.publicKeyBase64Url,
-      設定.expirationSec
+      BigInt(設定.expirationSec)
     );
 
     await fetch("/save-bundle", {
@@ -115,4 +115,12 @@ async function 有効化待ち(登録, タイムアウトms = 10000) {
   });
 }
 
-メイン();
+const 開始ボタン = document.querySelector("#start");
+if (開始ボタン) {
+  開始ボタン.addEventListener("click", () => {
+    メイン();
+  });
+} else {
+  // フォールバック（ボタンが無い場合）
+  メイン();
+}

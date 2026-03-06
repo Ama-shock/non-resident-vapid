@@ -17,24 +17,29 @@ exclude = [
     "Dockerfile",
 ]
 
+[features]
+default = ["server"]
+server = ["tokio", "web-push", "url"]
+
 [dependencies]
 anyhow = "1"
 base64 = "0.13"
 clap = { version = "4", features = ["derive"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
-web-push = "0.9"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"], optional = true }
+web-push = { version = "0.9", optional = true }
 rand = "0.8"
 sha2 = "0.10"
 aes-gcm = "0.10"
 hkdf = "0.12"
 p256 = { version = "0.13", features = ["ecdh"] }
 wasm-bindgen = { version = "0.2", optional = true }
-url = "2"
+url = { version = "2", optional = true }
 
 [lib]
 crate-type = ["rlib", "cdylib"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "0.2"
+getrandom = { version = "0.2", features = ["js"] }

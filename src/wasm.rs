@@ -47,7 +47,7 @@ pub fn decode_credential_bundle_wasm(
         .or_else(|_| {
             if private_key_bytes.len() == 32 {
                 let fb: &p256::elliptic_curve::FieldBytes<p256::NistP256> =
-                    p256::elliptic_curve::FieldBytes::from_slice(&private_key_bytes);
+                    p256::elliptic_curve::FieldBytes::<p256::NistP256>::from_slice(&private_key_bytes);
                 p256::SecretKey::from_bytes(fb)
             } else {
                 Err(p256::elliptic_curve::Error)

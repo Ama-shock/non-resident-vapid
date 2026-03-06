@@ -8,18 +8,22 @@
 //! ```
 
 pub mod credential_bundle;
-pub mod push_sender;
 pub mod subscription;
 #[cfg(target_arch = "wasm32")]
 pub mod wasm;
 pub mod key_store;
 
+#[cfg(all(not(target_arch = "wasm32"), feature = "server"))]
+pub mod push_sender;
+
 use anyhow::Result;
 use key_store::{KeyStore};
+#[cfg(all(not(target_arch = "wasm32"), feature = "server"))]
 use push_sender::pushを送信;
 
 /// 暗号化済みクレデンシャルバンドルを復号し、Push を送信する外部公開関数。
 /// 復号・署名は KeyStore/KeyHandle 実装に委譲する。
+#[cfg(all(not(target_arch = "wasm32"), feature = "server"))]
 pub async fn deliver_push_from_bundle(
     bundle: &[u8],
     payload: &str,

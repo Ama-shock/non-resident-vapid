@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "server")]
 use web_push::SubscriptionInfo;
 
 /// Push 購読データ（Base64URL 文字列のまま保持）
@@ -11,12 +12,14 @@ pub struct 購読データ {
     pub expiration_time: Option<serde_json::Value>,
 }
 
+#[cfg(feature = "server")]
 impl From<購読データ> for SubscriptionInfo {
     fn from(value: 購読データ) -> Self {
         SubscriptionInfo::new(&value.endpoint, &value.p256dh, &value.auth)
     }
 }
 
+#[cfg(feature = "server")]
 impl From<&購読データ> for SubscriptionInfo {
     fn from(value: &購読データ) -> Self {
         SubscriptionInfo::new(&value.endpoint, &value.p256dh, &value.auth)

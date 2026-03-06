@@ -302,10 +302,12 @@ mod tests {
             .duration_since(UNIX_EPOCH)
             .unwrap()
             .as_secs();
+        let browser_sk = P256SecretKey::random(&mut OsRng);
+        let browser_pk = browser_sk.public_key();
         let subscription = 購読データ {
             endpoint: "https://fcm.googleapis.com/fcm/send/YWFh:YmJi".into(),
             auth: base64url_encode(&[0xAA, 0xBB, 0xCC]),
-            p256dh: base64url_encode(&vec![0x01; 33]),
+            p256dh: base64url_encode(browser_pk.to_encoded_point(false).as_bytes()),
             expiration_time: None,
         };
         let recipient_sk = P256SecretKey::random(&mut OsRng);
@@ -332,10 +334,12 @@ mod tests {
 
     #[test]
     fn バンドル_decode_expired() {
+        let browser_sk = P256SecretKey::random(&mut OsRng);
+        let browser_pk = browser_sk.public_key();
         let subscription = 購読データ {
             endpoint: "https://example.test".into(),
             auth: base64url_encode(&[1, 2, 3]),
-            p256dh: base64url_encode(&[4, 5, 6, 7, 8, 9, 10]),
+            p256dh: base64url_encode(browser_pk.to_encoded_point(false).as_bytes()),
             expiration_time: None,
         };
         let recipient_sk = P256SecretKey::random(&mut OsRng);

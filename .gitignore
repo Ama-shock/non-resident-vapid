@@ -11,5 +11,3 @@
 # 生成物・ログ
 *.log
 /dist
-/pkg
-/package.json
