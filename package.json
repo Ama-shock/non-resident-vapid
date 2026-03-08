@@ -5,19 +5,6 @@
   "main": "./pkg/non_resident_vapid.js",
   "module": "./pkg/non_resident_vapid.js",
   "types": "./pkg/non_resident_vapid.d.ts",
-  "exports": {
-    ".": {
-      "types": "./pkg/non_resident_vapid.d.ts",
-      "import": "./pkg/non_resident_vapid.js",
-      "default": "./pkg/non_resident_vapid.js"
-    },
-    "./pkg/non_resident_vapid_bg.js": {
-      "types": "./pkg/non_resident_vapid_bg.js.d.ts",
-      "import": "./pkg/non_resident_vapid_bg.js",
-      "default": "./pkg/non_resident_vapid_bg.js"
-    },
-    "./pkg/non_resident_vapid_bg.wasm": "./pkg/non_resident_vapid_bg.wasm"
-  },
   "sideEffects": false,
   "files": [
     "pkg/"
