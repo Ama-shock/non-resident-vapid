@@ -233,6 +233,11 @@ export function __wbg_node_905d3e251edff8a2(arg0) {
     return ret;
 };
 
+export function __wbg_now_69d776cd24f5215b() {
+    const ret = Date.now();
+    return ret;
+};
+
 export function __wbg_process_dc0fbacc7c1c06f7(arg0) {
     const ret = arg0.process;
     return ret;

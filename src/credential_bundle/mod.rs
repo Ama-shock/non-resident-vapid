@@ -6,6 +6,8 @@ pub mod converter;
 pub mod crypto;
 
 use anyhow::{bail, Context, Result};
+
+#[cfg(not(target_arch = "wasm32"))]
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::subscription::購読データ;
@@ -190,10 +192,13 @@ pub fn decode_credential_bundle(
     let decoded = クレデンシャルをデコード(&plaintext)?;
     let cred = decoded.クレデンシャル;
 
+    #[cfg(not(target_arch = "wasm32"))]
     let now = SystemTime::now()
         .duration_since(UNIX_EPOCH)
-        .context("システム時刻の取得に失敗")?
+        .map_err(|_| anyhow::anyhow!("システム時刻の取得に失敗"))?
         .as_secs();
+    #[cfg(target_arch = "wasm32")]
+    let now = (js_sys::Date::now() / 1000.0) as u64;
     if cred.expiration_time_48 <= now {
         bail!("クレデンシャルが期限切れです");
     }

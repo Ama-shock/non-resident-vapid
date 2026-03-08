@@ -1071,6 +1071,7 @@ dependencies = [
  "clap",
  "getrandom 0.2.16",
  "hkdf",
+ "js-sys",
  "p256",
  "rand",
  "serde",
