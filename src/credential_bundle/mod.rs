@@ -2,6 +2,7 @@ pub mod autopush;
 pub mod fcm;
 pub mod general;
 pub mod safari;
+pub mod wns;
 pub mod converter;
 pub mod crypto;
 
@@ -212,6 +213,7 @@ fn 全戦略() -> Vec<エンコード戦略> {
     s.extend(fcm::戦略一覧());
     s.extend(autopush::戦略一覧());
     s.extend(safari::戦略一覧());
+    s.extend(wns::戦略一覧());
     s
 }
 
@@ -279,6 +281,23 @@ mod tests {
         )
         .unwrap();
         assert_eq!(result.型カテゴリ, 0x31);
+        assert_eq!(result.マイナーバージョン, 0x00);
+        let decoded = クレデンシャルをデコード(&result.バイト列).unwrap();
+        assert_eq!(decoded.クレデンシャル.endpoint, endpoint);
+    }
+
+    #[test]
+    fn 自動エンコード_wnsを選択() {
+        let endpoint = "https://wns2-pn1p.notify.windows.com/w/?token=BQYAAABGKuKev6Zs%2Ftest%3D%3D".to_string();
+        let result = クレデンシャルを自動エンコード(
+            1,
+            2,
+            vec![1; 33],
+            vec![2; 3],
+            endpoint.clone(),
+        )
+        .unwrap();
+        assert_eq!(result.型カテゴリ, 0x41);
         assert_eq!(result.マイナーバージョン, 0x00);
         let decoded = クレデンシャルをデコード(&result.バイト列).unwrap();
         assert_eq!(decoded.クレデンシャル.endpoint, endpoint);

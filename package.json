@@ -1,6 +1,6 @@
 {
   "name": "@ama-shock/non-resident-vapid",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Client-side encryption/decryption workflow for VAPID credentials and message relay",
   "main": "./pkg/non_resident_vapid.js",
   "module": "./pkg/non_resident_vapid.js",
